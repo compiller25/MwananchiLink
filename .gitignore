@@ -98,3 +98,10 @@ celerybeat.pid
 # ── Docker ───────────────────────────────────────────────────────────
 .docker/
 docker-compose.override.yml
+
+# ── MwananchiLink: excluded binaries / local tooling ────────────────────
+.claude/
+*.docx
+*.doc
+.~lock.*#
+dcrs.zip

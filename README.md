@@ -1,6 +1,6 @@
-# DCRS — District Citizen Response System
+# MwananchiLink — District Citizen Response System
 
-> A unified command centre for citizen registrations, ward-scoped approval workflows, a One-Stop emergency services centre, and real SMS communications via SendAfrica — built for Tanzanian municipal workflows.
+> MwananchiLink is a unified command centre for Tanzanian wards/districts: citizens self-register and track approval (CIT-XXXXXXXXXX), file service requests (ISS-XXXXXXXXXX) via a 5-tile One-Stop Centre, get automatic SMS at every step; ward officers approve/reject, assign technicians + appointments and log calls within their own ward only, while district admins see everything district-wide with full dashboard, reports and audit trail.
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-5.2-092E20?style=flat-square&logo=django&logoColor=white)
