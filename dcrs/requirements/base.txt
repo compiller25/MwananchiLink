@@ -1,8 +1,0 @@
-Django>=5.0,<5.3
-Pillow>=10
-python-dotenv>=1.0
-requests>=2.31
-
-# API layer for the React + TypeScript frontend (see /api/v1/)
-djangorestframework>=3.15
-drf-spectacular>=0.27
