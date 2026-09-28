@@ -1,0 +1,40 @@
+<aside class="app-sidebar" id="appSidebar">
+
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="{% url 'reports:dashboard' %}">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div><div class="brand-name">DCRS</div><div class="brand-sub">Operations Console</div></div>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav">
+    <span class="sidebar-section-label">Main</span>
+    <a href="{% url 'reports:dashboard' %}"        class="sidebar-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="{% url 'citizens:list' %}"            class="sidebar-link"><i class="bi bi-people"></i> Citizens</a>
+    <a href="{% url 'issues:list' %}"              class="sidebar-link"><i class="bi bi-exclamation-triangle"></i> Issues</a>
+
+    <span class="sidebar-section-label">Communications</span>
+    <a href="{% url 'notifications:compose' %}"    class="sidebar-link"><i class="bi bi-chat-dots"></i> Compose SMS</a>
+    <a href="{% url 'notifications:broadcast' %}"  class="sidebar-link"><i class="bi bi-broadcast"></i> Broadcast</a>
+    <a href="{% url 'notifications:log' %}"        class="sidebar-link"><i class="bi bi-journal-text"></i> SMS Log</a>
+
+    <span class="sidebar-section-label">Analytics</span>
+    <a href="{% url 'reports:registration_report' %}" class="sidebar-link"><i class="bi bi-bar-chart"></i> Reports</a>
+    <a href="{% url 'reports:audit_log' %}"        class="sidebar-link"><i class="bi bi-shield-check"></i> Audit Trail</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">{{ user.get_full_name|default:user.username|slice:":1"|upper }}</div>
+      <div>
+        <div class="sb-name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="sb-role">{{ user.role|default:'Officer' }}</div>
+      </div>
+    </div>
+  </div>
+
+</aside>

@@ -1,0 +1,10 @@
+{% if messages %}
+  <div class="mb-4" style="display:flex;flex-direction:column;gap:8px">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" data-autodismiss role="alert">
+        <i class="bi {% if message.tags == 'success' %}bi-check-circle{% elif message.tags == 'warning' %}bi-exclamation-triangle{% elif message.tags == 'error' or message.tags == 'danger' %}bi-x-circle{% else %}bi-info-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Registration Report — DCRS{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+
+{# ── Page header ── #}
+<div class="d-flex align-items-start justify-content-between mb-4">
+  <div>
+    <div class="page-header-h">Registration Report</div>
+    <div class="page-header-p">Filter and export citizen registrations by ward and approval status.</div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="{% url 'reports:audit_log' %}">
+    <i class="bi bi-shield-check"></i> Audit Trail
+  </a>
+</div>
+
+{# ── Status summary ── #}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Total Records</span>
+        <div class="stat-icon si-blue d-flex align-items-center justify-content-center">
+          <i class="bi bi-people-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">{{ citizens|length }}</div>
+      <div class="stat-sub mt-1">{% if selected_ward or selected_status %}Matching filter{% else %}All citizens{% endif %}</div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Approved</span>
+        <div class="stat-icon si-green d-flex align-items-center justify-content-center">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">{{ citizens|length }}</div>
+      <div class="stat-sub mt-1">
+        {% if selected_status == 'APPROVED' %}Filtered view{% else %}<a href="?status=APPROVED" style="color:var(--green);font-weight:600">View approved</a>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Pending</span>
+        <div class="stat-icon si-amber d-flex align-items-center justify-content-center">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+      </div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub mt-1"><a href="?status=PENDING" style="color:var(--amber);font-weight:600">View pending</a></div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Rejected</span>
+        <div class="stat-icon si-red d-flex align-items-center justify-content-center">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">—</div>
+      <div class="stat-sub mt-1"><a href="?status=REJECTED" style="color:var(--red);font-weight:600">View rejected</a></div>
+    </div>
+  </div>
+</div>
+
+{# ── Filter card ── #}
+<div class="card mb-4">
+  <div class="card-header">
+    <span class="card-title"><i class="bi bi-funnel me-1" style="color:var(--accent)"></i> Filter Records</span>
+    {% if selected_ward or selected_status %}
+      <a href="?" class="badge badge-amber" style="text-decoration:none;cursor:pointer">
+        <i class="bi bi-x-circle me-1"></i>Clear filters
+      </a>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <form method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Ward Name</label>
+          <div class="input-icon-wrap">
+            <i class="bi bi-geo-alt" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.82rem;pointer-events:none"></i>
+            <input class="form-control" name="ward" placeholder="e.g. Kariakoo, Sinza…" value="{{ selected_ward }}">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Approval Status</label>
+          <select class="form-select" name="status">
+            <option value="">All Statuses</option>
+            <option value="PENDING"   {% if selected_status == 'PENDING' %}selected{% endif %}>Pending</option>
+            <option value="APPROVED"  {% if selected_status == 'APPROVED' %}selected{% endif %}>Approved</option>
+            <option value="REJECTED"  {% if selected_status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+            <option value="SUSPENDED" {% if selected_status == 'SUSPENDED' %}selected{% endif %}>Suspended</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" type="submit" style="flex:1">
+              <i class="bi bi-search"></i> Apply Filter
+            </button>
+            <a class="btn btn-outline btn-sm" href="?">Reset</a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ── Results table ── #}
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="bi bi-table me-1" style="color:var(--accent)"></i>
+      {% if selected_ward or selected_status %}Filtered Results{% else %}All Registrations{% endif %}
+    </span>
+    <span class="badge badge-gray">{{ citizens|length }} record{{ citizens|length|pluralize }}</span>
+  </div>
+  <div class="table-wrap" style="border:none">
+    <table class="dcrs-table">
+      <thead>
+        <tr>
+          <th>Citizen ID</th>
+          <th>Full Name</th>
+          <th>Ward</th>
+          <th>District</th>
+          <th>Region</th>
+          <th>Status</th>
+          <th>Registered</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for citizen in citizens %}
+          <tr>
+            <td class="td-mono">{{ citizen.citizen_id }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--accent-tint);border:1px solid var(--accent-xdim);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:var(--accent);flex-shrink:0">
+                  {{ citizen.full_name|slice:":1"|upper }}
+                </div>
+                <span class="td-bold">{{ citizen.full_name }}</span>
+              </div>
+            </td>
+            <td>{{ citizen.ward.name }}</td>
+            <td>{{ citizen.district.name }}</td>
+            <td style="color:var(--muted);font-size:.8rem">{{ citizen.region.name }}</td>
+            <td><span class="badge status-{{ citizen.status }}">{{ citizen.get_status_display }}</span></td>
+            <td class="td-mono">{{ citizen.created_at|date:"d M Y" }}</td>
+            <td>
+              <a href="{% url 'citizens:detail' citizen.pk %}" class="btn btn-sm" style="background:var(--c-blue-dim,var(--accent-tint));color:var(--accent);border:none;font-size:.75rem;padding:4px 10px">
+                View <i class="bi bi-arrow-right"></i>
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" style="text-align:center;padding:64px 20px">
+              <i class="bi bi-bar-chart" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3;color:var(--muted)"></i>
+              <div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">No records match your filter.</div>
+              <a href="?" style="font-size:.8rem;font-weight:600;color:var(--accent)">Clear filters</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

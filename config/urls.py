@@ -23,7 +23,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("apps.citizens.urls")),
     path("accounts/", include("apps.accounts.urls")),
+    # Legacy JSON cascade kept for the existing templates' JS.
     path("api/localities/", include("apps.localities.urls")),
+    # Versioned JSON API consumed by the React + TypeScript frontend.
+    path("api/v1/", include("config.api_urls")),
     path("issues/", include("apps.issues.urls")),
     path("portal/sms/", include("apps.notifications.urls")),
     path("portal/reports/", include("apps.reports.urls")),

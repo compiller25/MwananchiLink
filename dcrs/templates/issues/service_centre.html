@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}One-Stop Services Centre — DCRS{% endblock %}
+{% block page_title %}Services Centre{% endblock %}
+
+{% block content %}
+<div style="max-width:900px;margin:0 auto;padding:32px 20px">
+
+  <div class="d-flex align-items-start justify-content-between mb-4" style="flex-wrap:wrap;gap:12px">
+    <div>
+      <div class="page-header-h">One-Stop Emergency & Services Centre</div>
+      <div class="page-header-p">Contact any essential service directly — pick a category to file a request.</div>
+    </div>
+    <a class="btn btn-outline btn-sm" href="{% url 'citizens:portal' %}">
+      <i class="bi bi-arrow-left"></i> Back to Portal
+    </a>
+  </div>
+
+  <div class="row g-3">
+    {% for service in services %}
+    <div class="col-md-6 col-lg-4">
+      <a href="{% url 'issues:submit' %}?category={{ service.category }}" class="card" style="text-decoration:none;display:block;height:100%;transition:box-shadow .15s,transform .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--sh2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div class="card-body" style="padding:24px 20px !important;text-align:center">
+          <div class="stat-icon si-blue d-flex align-items-center justify-content-center" style="width:56px;height:56px;margin:0 auto 14px;font-size:1.4rem">
+            <i class="bi {{ service.icon }}"></i>
+          </div>
+          <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:6px">{{ service.label }}</div>
+          <div style="font-size:.8rem;color:var(--muted);line-height:1.5">{{ service.desc }}</div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card mt-4" style="border-left:3px solid var(--accent)">
+    <div class="card-body" style="font-size:.84rem;color:var(--text2)">
+      <i class="bi bi-info-circle me-1" style="color:var(--accent)"></i>
+      Once submitted, a district officer will assign a technician and appointment date. You'll be notified by SMS and in your notification inbox — and can rate the service once it's resolved.
+    </div>
+  </div>
+
+</div>
+{% endblock %}

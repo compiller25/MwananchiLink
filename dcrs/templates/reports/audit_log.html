@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Audit Trail — DCRS{% endblock %}
+{% block page_title %}Audit Trail{% endblock %}
+
+{% block content %}
+
+{# ── Page header ── #}
+<div class="d-flex align-items-start justify-content-between mb-4">
+  <div>
+    <div class="page-header-h">Audit Trail</div>
+    <div class="page-header-p">Complete chronological record of every action performed in the system.</div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="{% url 'reports:registration_report' %}">
+    <i class="bi bi-bar-chart"></i> Reports
+  </a>
+</div>
+
+{# ── Legend row ── #}
+<div class="card mb-4">
+  <div class="card-body" style="padding:14px 20px !important">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span style="font-size:.73rem;font-weight:600;color:var(--muted);margin-right:4px;text-transform:uppercase;letter-spacing:.06em">Actions:</span>
+      <span class="badge badge-green"><i class="bi bi-plus-circle me-1"></i>CREATE</span>
+      <span class="badge badge-blue"><i class="bi bi-pencil me-1"></i>UPDATE</span>
+      <span class="badge badge-red"><i class="bi bi-trash me-1"></i>DELETE</span>
+      <span class="badge" style="background:var(--accent-tint);color:var(--accent)"><i class="bi bi-chat-dots me-1"></i>SEND</span>
+      <span class="badge badge-amber"><i class="bi bi-lock me-1"></i>AUTH</span>
+      <span class="badge badge-gray"><i class="bi bi-three-dots me-1"></i>OTHER</span>
+    </div>
+  </div>
+</div>
+
+{# ── Audit table ── #}
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="bi bi-shield-check me-1" style="color:var(--accent)"></i> Activity Log
+    </span>
+    {% if is_paginated %}
+      <span class="badge badge-gray">{{ paginator.count }} entries</span>
+    {% endif %}
+  </div>
+  <div class="table-wrap" style="border:none">
+    <table class="dcrs-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Entity</th>
+          <th>ID / Name</th>
+          <th>Summary</th>
+          <th>Actor</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr>
+
+            {# Action badge — colour coded #}
+            <td>
+              {% if log.action == 'CREATE' %}
+                <span class="badge badge-green"><i class="bi bi-plus-circle me-1"></i>{{ log.action }}</span>
+              {% elif log.action == 'UPDATE' %}
+                <span class="badge badge-blue"><i class="bi bi-pencil me-1"></i>{{ log.action }}</span>
+              {% elif log.action == 'DELETE' %}
+                <span class="badge badge-red"><i class="bi bi-trash me-1"></i>{{ log.action }}</span>
+              {% elif log.action == 'SEND' %}
+                <span class="badge" style="background:var(--accent-tint);color:var(--accent)"><i class="bi bi-chat-dots me-1"></i>{{ log.action }}</span>
+              {% elif log.action == 'AUTH' %}
+                <span class="badge badge-amber"><i class="bi bi-lock me-1"></i>{{ log.action }}</span>
+              {% else %}
+                <span class="badge badge-gray">{{ log.action }}</span>
+              {% endif %}
+            </td>
+
+            {# Entity type with icon #}
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                {% if log.entity_type == 'Citizen' %}
+                  <i class="bi bi-person-fill" style="color:var(--accent);font-size:.8rem"></i>
+                {% elif log.entity_type == 'Issue' %}
+                  <i class="bi bi-exclamation-triangle-fill" style="color:var(--amber);font-size:.8rem"></i>
+                {% elif log.entity_type == 'User' %}
+                  <i class="bi bi-shield-person-fill" style="color:var(--green);font-size:.8rem"></i>
+                {% elif log.entity_type == 'SMS' %}
+                  <i class="bi bi-chat-dots-fill" style="color:var(--accent);font-size:.8rem"></i>
+                {% else %}
+                  <i class="bi bi-file-earmark" style="color:var(--muted);font-size:.8rem"></i>
+                {% endif %}
+                <span style="font-size:.8rem;font-weight:600;color:var(--text2)">{{ log.entity_type }}</span>
+              </div>
+            </td>
+
+            {# Entity ID #}
+            <td class="td-mono">{{ log.entity_id|truncatechars:22 }}</td>
+
+            {# Summary #}
+            <td style="max-width:280px">
+              <span style="font-size:.82rem;color:var(--text2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ log.summary }}">
+                {{ log.summary|truncatechars:62 }}
+              </span>
+            </td>
+
+            {# Actor with avatar #}
+            <td>
+              {% if log.actor %}
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:26px;height:26px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:var(--text);flex-shrink:0">
+                    {{ log.actor.get_full_name|default:log.actor.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <div style="font-size:.8rem;font-weight:600;color:var(--text);line-height:1.2">{{ log.actor.get_short_name|default:log.actor.username }}</div>
+                    <div style="font-size:.7rem;color:var(--muted)">{{ log.actor.role }}</div>
+                  </div>
+                </div>
+              {% else %}
+                <span style="font-size:.8rem;color:var(--muted)"><i class="bi bi-gear me-1"></i>System</span>
+              {% endif %}
+            </td>
+
+            {# Timestamp #}
+            <td>
+              <div class="td-mono">{{ log.created_at|date:"d M Y" }}</div>
+              <div style="font-size:.7rem;color:var(--muted)">{{ log.created_at|date:"H:i" }}</div>
+            </td>
+
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" style="text-align:center;padding:64px 20px">
+              <i class="bi bi-shield-check" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3;color:var(--muted)"></i>
+              <div style="font-size:.85rem;color:var(--muted)">No audit entries yet.</div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if is_paginated %}
+    <div style="border-top:1px solid var(--border)">{% include 'partials/pagination.html' %}</div>
+  {% endif %}
+</div>
+
+{% endblock %}

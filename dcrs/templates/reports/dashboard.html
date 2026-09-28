@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — DCRS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Total Citizens</span>
+        <div class="stat-icon si-blue d-flex align-items-center justify-content-center">
+          <i class="bi bi-people-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">{{ total_citizens }}</div>
+      <div class="stat-sub mt-1">Registered in system</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Pending Approvals</span>
+        <div class="stat-icon si-amber d-flex align-items-center justify-content-center">
+          <i class="bi bi-clock-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">{{ pending_approvals }}</div>
+      <div class="stat-sub mt-1">Awaiting review</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">Open Issues</span>
+        <div class="stat-icon si-red d-flex align-items-center justify-content-center">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">{{ open_issues }}</div>
+      <div class="stat-sub mt-1">Unresolved reports</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <span class="stat-label">SMS Sent Today</span>
+        <div class="stat-icon si-green d-flex align-items-center justify-content-center">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+      </div>
+      <div class="stat-num">{{ sms_sent_today }}</div>
+      <div class="stat-sub mt-1">Notifications dispatched</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Two panels -->
+<div class="row g-3 mb-3">
+
+  <!-- Recent Citizens -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <span class="card-title">Recent Citizens</span>
+        <a href="{% url 'citizens:list' %}" style="font-size:.76rem;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:4px">
+          View all <i class="bi bi-arrow-right" style="font-size:.7rem"></i>
+        </a>
+      </div>
+      <div class="card-body" style="padding:6px 20px 12px !important">
+
+        {% for citizen in recent_citizens %}
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
+
+            <!-- Avatar circle -->
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--accent-tint);border:1px solid var(--accent-xdim);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:var(--accent);flex-shrink:0">
+              {{ citizen.full_name|slice:":1"|upper }}
+            </div>
+
+            <!-- Name + meta -->
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.84rem;font-weight:600;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ citizen.full_name }}</div>
+              <div style="font-size:.74rem;color:var(--muted);line-height:1.3">{{ citizen.ward.name }} &nbsp;·&nbsp; {{ citizen.citizen_id }}</div>
+            </div>
+
+            <span class="badge status-{{ citizen.status }}">{{ citizen.get_status_display }}</span>
+          </div>
+        {% empty %}
+          <div style="text-align:center;padding:32px 0;color:var(--muted);font-size:.83rem">
+            <i class="bi bi-people" style="font-size:1.6rem;display:block;margin-bottom:8px;opacity:.4"></i>
+            No citizens yet.
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Issues -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <span class="card-title">Recent Issues</span>
+        <a href="{% url 'issues:list' %}" style="font-size:.76rem;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:4px">
+          View all <i class="bi bi-arrow-right" style="font-size:.7rem"></i>
+        </a>
+      </div>
+      <div class="card-body" style="padding:6px 20px 12px !important">
+
+        {% for issue in recent_issues %}
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
+
+            <!-- Status dot -->
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent3);flex-shrink:0;margin-top:1px"></div>
+
+            <!-- Title + meta -->
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.84rem;font-weight:600;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                <a href="{% url 'issues:detail' issue.pk %}" style="color:inherit">{{ issue.title|truncatechars:46 }}</a>
+              </div>
+              <div style="font-size:.74rem;color:var(--muted);line-height:1.3">{{ issue.reference_no }} &nbsp;·&nbsp; {{ issue.citizen.full_name }}</div>
+            </div>
+
+            <span class="badge status-{{ issue.status }}">{{ issue.get_status_display }}</span>
+          </div>
+        {% empty %}
+          <div style="text-align:center;padding:32px 0;color:var(--muted);font-size:.83rem">
+            <i class="bi bi-exclamation-triangle" style="font-size:1.6rem;display:block;margin-bottom:8px;opacity:.4"></i>
+            No issues yet.
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Activity Feed -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">
+      <i class="bi bi-shield-check me-1" style="color:var(--accent)"></i> Activity Feed
+    </span>
+    <a href="{% url 'reports:audit_log' %}" style="font-size:.76rem;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:4px">
+      Full audit trail <i class="bi bi-arrow-right" style="font-size:.7rem"></i>
+    </a>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="dcrs-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Entity</th>
+          <th>Summary</th>
+          <th>Actor</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in recent_activity %}
+          <tr>
+            <td><span class="badge badge-blue">{{ item.action }}</span></td>
+            <td class="td-mono">{{ item.entity_type }}</td>
+            <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text2)">{{ item.summary|truncatechars:55 }}</td>
+            <td class="td-bold">{{ item.actor|default:'System' }}</td>
+            <td class="td-mono">{{ item.created_at|date:"d M, H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:.83rem">
+              <i class="bi bi-journal-text" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:.4"></i>
+              No activity recorded yet.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

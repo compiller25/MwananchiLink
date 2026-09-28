@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login — DCRS{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+
+  <div class="auth-side">
+    <div class="auth-circle c1"></div>
+    <div class="auth-circle c2"></div>
+
+    <div class="auth-side-body">
+      <h2>One login for citizens and district staff</h2>
+      <p>Citizens track registration status and service requests; officers manage approvals, issues, and ward-wide SMS communications — all from the same secure sign-in.</p>
+      <div class="auth-chips">
+        <span class="auth-chip"><i class="bi bi-person-check me-1"></i>Citizen portal</span>
+        <span class="auth-chip"><i class="bi bi-shield-lock me-1"></i>Role-based access</span>
+        <span class="auth-chip"><i class="bi bi-chat-dots me-1"></i>SMS workflows</span>
+        <span class="auth-chip"><i class="bi bi-journal-check me-1"></i>Full audit trail</span>
+      </div>
+    </div>
+
+    <img class="auth-side-art" src="{% static 'img/auth-side.svg' %}" alt="" aria-hidden="true">
+
+    <div class="auth-side-foot">Tanzania Local Government</div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-corner-toggle">
+      <button class="btn-theme" data-theme-toggle title="Toggle theme"><i class="bi bi-moon"></i></button>
+    </div>
+
+    <div class="auth-inner">
+      <h1 class="auth-form-title">Welcome back</h1>
+      <p class="auth-form-sub">Citizens and officers both sign in here — use your registered phone number or username.</p>
+
+      {% if form.non_field_errors %}
+        <div class="auth-error">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" style="display:flex;flex-direction:column;gap:16px">
+        {% csrf_token %}
+
+        <div>
+          <label class="form-label" for="id_username">Username or phone number</label>
+          <div class="input-icon-wrap">
+            <i class="bi bi-person"></i>
+            {{ form.username }}
+          </div>
+          {% if form.username.errors %}<div style="font-size:.74rem;color:var(--red);margin-top:3px">{{ form.username.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div>
+          <label class="form-label" for="id_password">Password</label>
+          <div class="input-icon-wrap">
+            <i class="bi bi-lock"></i>
+            {{ form.password }}
+          </div>
+          {% if form.password.errors %}<div style="font-size:.74rem;color:var(--red);margin-top:3px">{{ form.password.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-forgot"><a href="{% url 'accounts:password_reset' %}">Forgot password?</a></div>
+
+        <button class="btn btn-primary btn-lg w-100 justify-content-center" type="submit">
+          <i class="bi bi-box-arrow-in-right"></i> Sign in
+        </button>
+      </form>
+
+      <div class="auth-back">
+        New citizen? <a href="{% url 'citizens:register' %}">Register here</a> — you'll be logged in right away.
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

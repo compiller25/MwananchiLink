@@ -277,17 +277,3 @@ python manage.py seed
 ```
 
 No application code changes needed — the seed command and all views are database-agnostic.
-
----
-
-## Deployment
-
-See **[DEPLOY.md](DEPLOY.md)** for the full step-by-step guide covering:
-
-- DNS A record setup for `dcrs.simamia.online`
-- Ubuntu 22.04 server preparation
-- PostgreSQL setup
-- Gunicorn on port `8077` as a systemd service
-- Nginx reverse proxy with SSL via Let's Encrypt
-- UFW firewall configuration
-- Update workflow and troubleshooting reference

@@ -27,6 +27,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # ── Third-party ──────────────────────────────────────────────────────────
+    "rest_framework",
+    "drf_spectacular",
+    # ── Local apps ───────────────────────────────────────────────────────────
     "apps.accounts",
     "apps.localities",
     "apps.citizens",
@@ -148,5 +152,29 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
 SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
 
-# ── Misc ──────────────────────────────────────────────────────────────────────
+# ── API layer (DRF) ───────────────────────────────────────────────────────────
+# The React + TypeScript SPA consumes /api/v1/**. Auth is the existing Django
+# session (UsernameOrPhoneBackend), so SessionAuthentication is all we need —
+# it also enforces CSRF on unsafe methods, which the SPA satisfies with the
+# X-CSRFToken header (bootstrapped from GET /api/v1/auth/csrf/).
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,  # mirrors the templates' paginate_by = 10
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "DCRS API",
+    "DESCRIPTION": "JSON API for the DCRS React + TypeScript frontend.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

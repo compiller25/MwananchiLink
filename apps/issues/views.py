@@ -9,6 +9,7 @@ from apps.accounts.mixins import WardScopedQuerysetMixin
 from apps.citizens.models import Citizen
 from apps.notifications.services import send_issue_update_sms
 
+from .constants import SERVICE_TILES
 from .forms import IssueCommentForm, IssueFeedbackForm, IssueForm, IssueStatusForm
 from .models import Issue, IssueComment
 
@@ -18,13 +19,8 @@ class ServiceCentreView(LoginRequiredMixin, TemplateView):
 
     template_name = "issues/service_centre.html"
 
-    SERVICES = [
-        {"category": "WATER", "label": "Water", "icon": "bi-droplet", "desc": "Pipe bursts, no supply, reconnection"},
-        {"category": "ELECTRICITY", "label": "Electricity", "icon": "bi-lightning-charge", "desc": "Outages, new connections, faults"},
-        {"category": "SANITATION", "label": "Waste", "icon": "bi-trash", "desc": "Uncollected garbage, pickup scheduling"},
-        {"category": "ROAD", "label": "Roads", "icon": "bi-signpost-split", "desc": "Potholes, flooding, road repairs"},
-        {"category": "SECURITY", "label": "Security", "icon": "bi-shield-exclamation", "desc": "Crime, suspicious activity, patrols"},
-    ]
+    # Shared with the API (GET /api/v1/issues/services/) so both stay in sync.
+    SERVICES = SERVICE_TILES
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

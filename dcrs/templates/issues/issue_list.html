@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Issues — DCRS{% endblock %}
+{% block page_title %}Issues{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between mb-4">
+  <div>
+    <div class="page-header-h">Community Issues</div>
+    <div class="page-header-p">Track municipal complaints and coordinate resolution across wards.</div>
+  </div>
+  <a class="btn btn-primary btn-sm" href="{% url 'issues:submit' %}">
+    <i class="bi bi-plus-lg"></i> Report Issue
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-wrap" style="border:none;border-radius:var(--r-lg)">
+    <table class="dcrs-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Ward</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in issues %}
+          <tr>
+            <td class="td-mono">{{ issue.reference_no }}</td>
+            <td class="td-bold">{{ issue.title|truncatechars:44 }}</td>
+            <td>{{ issue.get_category_display }}</td>
+            <td>{{ issue.ward.name }}</td>
+            <td><span class="badge priority-{{ issue.priority }}">{{ issue.get_priority_display }}</span></td>
+            <td><span class="badge status-{{ issue.status }}">{{ issue.get_status_display }}</span></td>
+            <td>
+              <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-sm" style="background:var(--c-blue-dim);color:var(--c-blue);border:none;font-size:0.75rem;padding:4px 10px">
+                View <i class="bi bi-arrow-right"></i>
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-center py-5" style="color:var(--c-muted);font-size:0.84rem">
+            <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size:1.5rem;opacity:0.4"></i>No issues reported yet.
+          </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if is_paginated %}
+    <div style="border-top:1px solid var(--c-border)">{% include 'partials/pagination.html' %}</div>
+  {% endif %}
+</div>
+{% endblock %}

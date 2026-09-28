@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block title %}Update {{ issue.reference_no }} — DCRS{% endblock %}
+{% block page_title %}Update Issue{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-start justify-content-between mb-4">
+  <div>
+    <div class="page-header-h">Update Issue</div>
+    <div class="page-header-p">{{ issue.reference_no }} &nbsp;·&nbsp; {{ issue.title|truncatechars:60 }}</div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="{% url 'issues:detail' issue.pk %}">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="card mb-3">
+        <div class="card-header"><span class="card-title"><i class="bi bi-toggle-on me-1" style="color:var(--accent)"></i> Status & Assignment</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Status</label>
+              {{ form.status }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Assigned Officer</label>
+              {{ form.assigned_officer }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header"><span class="card-title"><i class="bi bi-tools me-1" style="color:var(--accent)"></i> Technician & Appointment</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Technician Name</label>
+              {{ form.assigned_technician_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Appointment Date/Time</label>
+              {{ form.appointment_at }}
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:.76rem;color:var(--muted)">
+            <i class="bi bi-info-circle me-1"></i> Setting or changing these sends the citizen an SMS with the appointment details.
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header"><span class="card-title"><i class="bi bi-lock me-1" style="color:var(--amber)"></i> Internal Notes</span></div>
+        <div class="card-body">
+          {{ form.internal_notes }}
+          <div style="margin-top:8px;font-size:.76rem;color:var(--muted)">
+            <i class="bi bi-info-circle me-1"></i> Internal notes are only visible to staff members.
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title"><i class="bi bi-arrow-up-circle me-1" style="color:var(--red)"></i> Escalation</span></div>
+        <div class="card-body">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.88rem;color:var(--text2)">
+            {{ form.escalated_to_district }}
+            <div>
+              <div style="font-weight:600;color:var(--text)">Escalate to district office</div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:2px">Flag this issue for district-level attention</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg me-1"></i> Save Changes
+        </button>
+        <a href="{% url 'issues:detail' issue.pk %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  {# Right sidebar — current issue state #}
+  <div class="col-lg-5">
+    <div class="card" style="position:sticky;top:80px">
+      <div class="card-header"><span class="card-title">Current State</span></div>
+      <div class="card-body" style="padding:0 !important">
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Status</span>
+          <span class="badge status-{{ issue.status }}">{{ issue.get_status_display }}</span>
+        </div>
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Priority</span>
+          <span class="badge priority-{{ issue.priority }}">{{ issue.get_priority_display }}</span>
+        </div>
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Category</span>
+          <span style="font-size:.82rem;font-weight:600;color:var(--text)">{{ issue.get_category_display }}</span>
+        </div>
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Ward</span>
+          <span style="font-size:.82rem;color:var(--text)">{{ issue.ward.name }}</span>
+        </div>
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Citizen</span>
+          <span style="font-size:.82rem;font-weight:600;color:var(--text)">{{ issue.citizen.full_name }}</span>
+        </div>
+        {% if issue.assigned_technician_name %}
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Technician</span>
+          <span style="font-size:.82rem;font-weight:600;color:var(--text)">{{ issue.assigned_technician_name }}</span>
+        </div>
+        {% endif %}
+        {% if issue.appointment_at %}
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Appointment</span>
+          <span style="font-size:.82rem;font-weight:600;color:var(--text)">{{ issue.appointment_at|date:"d M Y, H:i" }}</span>
+        </div>
+        {% endif %}
+        <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Opened</span>
+          <span style="font-size:.78rem;color:var(--text)">{{ issue.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+        {% if issue.escalated_to_district %}
+        <div style="padding:11px 18px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Escalated</span>
+          <span class="badge badge-red"><i class="bi bi-arrow-up-circle me-1"></i>Yes</span>
+        </div>
+        {% else %}
+        <div style="padding:11px 18px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Escalated</span>
+          <span style="font-size:.82rem;color:var(--muted)">No</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

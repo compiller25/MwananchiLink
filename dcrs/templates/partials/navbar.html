@@ -1,0 +1,64 @@
+<nav class="app-navbar">
+  <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1">
+    <button class="btn-hamburger" type="button" data-sidebar-toggle aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div style="min-width:0">
+      <div class="nav-bc">District Citizen Response System</div>
+      <div class="nav-title">{% block page_title %}Dashboard{% endblock %}</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <button class="btn-theme" data-theme-toggle title="Toggle theme"><i class="bi bi-moon"></i></button>
+
+    <div class="dropdown">
+      <button class="btn btn-sm btn-outline dropdown-toggle" data-bs-toggle="dropdown" type="button" style="position:relative">
+        <i class="bi bi-bell"></i>
+        {% if unread_notifications_count %}
+        <span style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.62rem;display:flex;align-items:center;justify-content:center;font-weight:700">{{ unread_notifications_count }}</span>
+        {% endif %}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" style="width:320px;max-width:90vw">
+        <li><h6 class="dropdown-header">Notifications</h6></li>
+        {% for n in unread_notifications %}
+        <li>
+          <a class="dropdown-item" style="white-space:normal;font-size:.8rem;line-height:1.5;padding:8px 16px"
+             href="{% if n.related_issue %}{% url 'issues:detail' n.related_issue.pk %}{% elif n.related_citizen %}{% url 'citizens:detail' n.related_citizen.pk %}{% else %}{% url 'notifications:inbox' %}{% endif %}">
+            {{ n.message|truncatechars:80 }}
+          </a>
+        </li>
+        {% empty %}
+        <li><span class="dropdown-item" style="font-size:.8rem;opacity:.6;pointer-events:none">No unread notifications</span></li>
+        {% endfor %}
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" style="font-size:.8rem;font-weight:600;color:var(--accent)" href="{% url 'notifications:inbox' %}">View all notifications</a></li>
+      </ul>
+    </div>
+
+    <span class="badge badge-blue d-none d-md-inline-flex">{{ user.role|default:'Guest' }}</span>
+
+    <div class="dropdown">
+      <button class="btn btn-sm btn-outline dropdown-toggle" data-bs-toggle="dropdown" type="button">
+        <i class="bi bi-person-circle"></i>
+        <span class="d-none d-sm-inline">{{ user.get_short_name|default:user.username }}</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+          <span class="dropdown-item" style="font-size:.75rem;opacity:.6;pointer-events:none;cursor:default">
+            {{ user.email|default:user.username }}
+          </span>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:inherit">
+              <i class="bi bi-box-arrow-right"></i> Sign out
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
